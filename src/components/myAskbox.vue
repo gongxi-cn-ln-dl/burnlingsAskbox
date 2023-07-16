@@ -6,7 +6,7 @@ import cookies from 'vue-cookies';
 import { ElMessage } from 'element-plus';
 import { useRoute } from 'vue-router'
 
-const host = "https://burnlingsapi.vercel.app"
+const host = "https://api.burnling.asia"
 const userId = cookies.get('userId') ? cookies.get('userId') : '-1'
 
 const questionList = ref([])
@@ -70,7 +70,8 @@ async function getAskedQuestions(){
         const userName = await getUserNameByUserId(element['toUser'])
         element['username'] = userName
         element['_id'] = id_++
-        element['text'] = CryptoJS.enc.Base64.parse(element['text']).toString(CryptoJS.enc.Utf8);;
+        element['text'] = CryptoJS.enc.Base64.parse(element['text']).toString(CryptoJS.enc.Utf8);
+        element['answer'] = CryptoJS.enc.Base64.parse(element['answer']).toString(CryptoJS.enc.Utf8);
         questionList.value.push(element)
       });
       // questionList.value = toRaw(questionList.value)
@@ -94,6 +95,7 @@ async function getMyQuestions(){
     res.data.others.texts.forEach(element => {
       element['_id'] = id_++
       element['text'] = CryptoJS.enc.Base64.parse(element['text']).toString(CryptoJS.enc.Utf8);
+      element['answer'] = CryptoJS.enc.Base64.parse(element['answer']).toString(CryptoJS.enc.Utf8);
       myQuestionList.value.push(element)
     });
     // myQuestionList.value = toRaw(myQuestionList.value)
@@ -142,7 +144,7 @@ function submitAnswer(){
       'userId':userId,
       'token':cookies.get('token'),
       'bdCode':myQuestionList.value[clickedCardId.value].bdCode,
-      'answer': answerTextArea.value
+      'answer': CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(answerTextArea.value))
     }
   }).then(res => {
     // console.log(res.data)

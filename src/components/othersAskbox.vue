@@ -7,7 +7,7 @@ import { ElMessage } from 'element-plus';
 import { useRoute } from 'vue-router'
 
 const text = ref('')
-const host = "https://burnlingsapi.vercel.app"
+const host = "https://api.burnling.asia"
 const route = useRoute()
 
 function BangDing(userId, bdCode){

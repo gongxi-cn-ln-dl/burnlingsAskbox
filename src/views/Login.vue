@@ -8,7 +8,7 @@
 
   const router = useRouter()
 
-  const host = "https://burnlingsapi.vercel.app"
+  const host = "https://api.burnling.asia"
   const username = ref('')
   const password = ref('')
 
