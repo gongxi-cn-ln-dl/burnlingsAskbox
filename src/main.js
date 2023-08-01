@@ -4,9 +4,11 @@ import 'element-plus/dist/index.css'
 import App from './App.vue'
 import router from './router'
 
-
+// const host = "https://api.burnling.asia"
 const app = createApp(App)
 
 app.use(ElementPlus)
 app.use(router)
 app.mount('#app')
+
+// console.log(router)

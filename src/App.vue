@@ -21,6 +21,8 @@ provide('reload', reload)
   <el-container direction="vertical">
     <myMenu :key="userId"></myMenu>
     <RouterView v-if="routerState" />
+    <el-text>
+    </el-text>
   </el-container>
 </template>
 

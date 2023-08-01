@@ -34,8 +34,8 @@
         cookies.set('userName',username.value)
         cookies.set('token',res.data.others.token)
         reloadApp()
-        // router.push('/askbox/'+res.data.others.userId)
-        // router.go(1)
+        router.push('/askbox/'+res.data.others.userId)
+        router.go(1)
       }else{
         ElMessage({
           showClose: true,
@@ -79,11 +79,14 @@
       // // console.log(error);
     });
   }
+
+  const isMobile = ref(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))
+  const divClass = ref(isMobile.value ? "el-main_Mobile" : "el-main_PC")
 </script>
 
 <template>
   <el-container direction="vertical">
-    <el-main>
+    <el-main :class="divClass">
       <h2>登录</h2>
       <el-form id="input-area">        
         <el-input class="input-box" v-model="username" placeholder="User Name" clearable @keyup.enter.native="login" />
@@ -100,9 +103,12 @@
 #input-area *{
   margin-top: 12px;
 }
-.el-main{
+.el-main_PC{
   width: 30%;
   margin: 0 auto;
 }
-
+.el-main_Mobile{
+  width: 100%;
+  margin: 0 auto;
+}
 </style>

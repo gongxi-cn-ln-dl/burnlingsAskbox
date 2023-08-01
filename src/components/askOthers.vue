@@ -1,16 +1,15 @@
 <script setup>
 import axios from 'axios';
-import CryptoJS from "crypto-js";
-import { ref } from 'vue';
 import cookies from 'vue-cookies';
 import { ElMessage } from 'element-plus';
-import { useRoute } from 'vue-router'
+import { ref } from 'vue';
 
+import { encodeString } from "@/api/getdata.js"
+
+const props = defineProps(['toUser'])
 const text = ref('')
 const host = "https://api.burnling.asia"
-const route = useRoute()
-
-const toUser = route.params.id;
+const userId = cookies.get('userId') ? cookies.get('userId') : '-1'
 
 function BangDing(userId, bdCode) {
   axios({
@@ -42,33 +41,53 @@ function BangDing(userId, bdCode) {
 }
 
 function submit() {
-  const userId = cookies.get('userId') ? cookies.get('userId') : '-1'
+
   axios({
     method: 'post',
     url: `${host}/vue-project/submitText`,
     data: {
-      'text': CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text.value)),
+      'text': encodeString(text.value),
       'userId': userId,
       'token': cookies.get('token'),
-      'toUser': toUser
+      'toUser': props.toUser
     },
     withCredentials: false
   }).then(res => {
-
-    BangDing(userId, res.data.others.bdCode)
+    if(res.data.success){
+      if (userId.value && userId.value != '-1') {
+        BangDing(userId, res.data.others.bdCode)
+      } else {
+        ElMessage({
+          type: 'success',
+          message: `提交成功！绑定码为${userId, res.data.others.bdCode}`,
+          center: true,
+          showClose: true,
+          duration: 0
+        })
+        text.value = ''
+      }
+    }else{
+      ElMessage({
+        type: 'error',
+        message: res.data.response,
+        center: true
+      })
+      answerTextArea.value = ''
+    }
   })
 }
+
 </script>
 
 <template>
-  <v-title>{{ }}</v-title>
-  <el-container direction="vertical">
+  <h3>提问区</h3>
+  <div style="width: 100%;">
     <el-form id="input-area">
       <el-input v-model="text" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" maxlength="1000" id="_textArea"
         show-word-limit />
       <el-button @click="submit" type="primary" plain>提交</el-button>
     </el-form>
-  </el-container>
+  </div>
 </template>
 
 <style scoped>
@@ -85,4 +104,5 @@ function submit() {
 .el-input {
   margin-top: 10px;
 }
+
 </style>

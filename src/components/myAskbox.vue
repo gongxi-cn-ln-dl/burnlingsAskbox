@@ -1,13 +1,13 @@
 <script setup>
 import axios from 'axios';
 import CryptoJS from "crypto-js";
-import { ref, reactive, toRaw, onMounted  } from 'vue';
+import { ref, onMounted  } from 'vue';
 import cookies from 'vue-cookies';
 import { ElMessage } from 'element-plus';
-import { useRoute } from 'vue-router'
 
 const host = "https://api.burnling.asia"
 const userId = cookies.get('userId') ? cookies.get('userId') : '-1'
+const token = cookies.get('token')
 
 const questionList = ref([])
 const myQuestionList = ref([])
@@ -21,17 +21,10 @@ const drawer = ref(false)
 const clickedCardId = ref(0)
 const answerTextArea = ref('')
 
-const text1 = ref(false)
-const text2 = ref(false)
-const text3 = ref('')
-const text4 = ref('')
-const text5 = ref('')
-const text6 = ref('')
-
 async function getUserNameByUserId(userid){
-  // console.log(userid)
+
   if(usersDict.value.userid){
-    // console.log("A,",usersDict.value.userid)
+
     return usersDict.value.userid
   }else{
     await axios({
@@ -44,7 +37,7 @@ async function getUserNameByUserId(userid){
     }).then(res => {
       if(res.data.success){
         usersDict.value[userid] = res.data.others.username
-        // console.log("B",usersDict.value[userid])
+
       }
       return usersDict.value[userid]
     })
@@ -58,12 +51,12 @@ async function getAskedQuestions(){
     url: `${host}/vue-project/getAskedQuestions`,
     data: {
       'userId': userId,
-      'token': cookies.get('token')
+      'token': token
     },
     withCredentials: false
   }).then(res => {
     if(res.data.success){
-      // console.log(res.data.others.texts)
+
       questionList.value = []
       var id_ = 0;
       res.data.others.texts.forEach(async element => {
@@ -89,7 +82,7 @@ async function getMyQuestions(){
     },
     withCredentials: false
   }).then(res => {
-    // console.log(res.data.others.texts)
+
     myQuestionList.value = []
     var id_ = 0;
     res.data.others.texts.forEach(element => {
@@ -100,7 +93,7 @@ async function getMyQuestions(){
     });
     // myQuestionList.value = toRaw(myQuestionList.value)
 
-    // console.log(myQuestionList.value)
+
   })
 }
 
@@ -110,30 +103,16 @@ function convert(){
   isSecond.value = !isSecond.value
 
   if(isSecond.value){
-    // console.log("SEC")
     getAskedQuestions()
   }else{
-    // console.log("FIS")
     getMyQuestions()
   }
-  // console.log(isFirst.value,isSecond.value)
+
 }
 
 function clickCard(cardId){
   drawer.value = true
   clickedCardId.value = cardId
-  if(isFirst.value){
-    // console.log("FIS",myQuestionList.value[cardId])
-    text1.value = myQuestionList.value[cardId].answered
-    text3.value = myQuestionList.value[cardId].answer
-    text5.value = myQuestionList.value[cardId].text
-  }else{
-    // console.log("SEC",questionList.value[cardId])
-    text2.value = questionList.value[cardId].answered
-    text4.value = questionList.value[cardId].answer
-    text6.value = questionList.value[cardId].text
-  }
-  // console.log(cardId)
 }
 
 function submitAnswer(){
@@ -142,12 +121,12 @@ function submitAnswer(){
     url: `${host}/vue-project/submitAnswer`,
     data: {
       'userId':userId,
-      'token':cookies.get('token'),
+      'token':token,
       'bdCode':myQuestionList.value[clickedCardId.value].bdCode,
       'answer': CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(answerTextArea.value))
     }
   }).then(res => {
-    // console.log(res.data)
+
     if(res.data.success){
       ElMessage({
         type: 'success',
@@ -156,6 +135,13 @@ function submitAnswer(){
       })
       myQuestionList.value[clickedCardId.value].answered = true
       myQuestionList.value[clickedCardId.value].answer = answerTextArea.value
+      answerTextArea.value = ''
+    }else{
+      ElMessage({
+        type: 'error',
+        message: res.data.response,
+        center: true
+      })
       answerTextArea.value = ''
     }
   })
